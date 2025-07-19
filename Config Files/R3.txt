@@ -1,0 +1,123 @@
+
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname R3
+!
+boot-start-marker
+boot-end-marker
+!
+aqm-register-fnf
+!
+!
+no aaa new-model
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+!
+!
+
+
+!
+!
+!
+!
+ip cef
+no ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+!
+!
+redundancy
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Ethernet0/0
+ no shutdown
+ ip address 150.3.3.3 255.255.255.0
+!
+interface Ethernet1/0
+ no shutdown
+ ip address 10.0.0.6 255.255.255.252
+!
+interface Ethernet1/2
+ no shutdown
+ ip address 10.0.0.13 255.255.255.252
+!
+router bgp 254
+ bgp log-neighbor-changes
+ network 150.3.3.0 mask 255.255.255.0 route-map cm
+ neighbor 10.0.0.5 remote-as 254
+ neighbor 10.0.0.5 password CCNP
+ neighbor 10.0.0.5 timers 5 15
+ neighbor 10.0.0.5 route-map R1-NEXT-HOP out
+ neighbor 10.0.0.14 remote-as 254
+ neighbor 10.0.0.14 password CCNP
+ neighbor 10.0.0.14 timers 5 15
+ neighbor 10.0.0.14 route-reflector-client
+ neighbor 10.0.0.14 route-map R4-NEXT-HOP out
+!
+ip forward-protocol nd
+!
+ip bgp-community new-format
+!
+no ip http server
+no ip http secure-server
+!
+!
+route-map cm permit 10
+ set community 254:333
+!
+route-map R1-NEXT-HOP permit 10
+ set ip next-hop 10.0.0.6
+!
+route-map R4-NEXT-HOP permit 10
+ set ip next-hop 10.0.0.13
+!
+!
+!
+control-plane
+!
+!
+!
+!
+!
+!
+!
+!
+line con 0
+ logging synchronous
+line aux 0
+line vty 0 4
+ login
+ transport input none
+!
+!
+end
